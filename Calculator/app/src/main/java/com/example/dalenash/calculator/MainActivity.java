@@ -117,6 +117,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     // Adds numbers to the display and commands
     public void number(String num) {
+        add.setBackgroundResource(R.drawable.orange_button);
+        subtract.setBackgroundResource(R.drawable.orange_button);
+        multiply.setBackgroundResource(R.drawable.orange_button);
+        divide.setBackgroundResource(R.drawable.orange_button);
+        add.setTextColor(0xffffffff);
+        subtract.setTextColor(0xffffffff);
+        multiply.setTextColor(0xffffffff);
+        divide.setTextColor(0xffffffff);
         if (afterSymbol)
             clear(false, false);
         if (display.length() < 8) {
@@ -156,6 +164,46 @@ public class MainActivity extends Activity implements View.OnClickListener {
         else
             commands.add(op);
         System.out.println(commands);
+        if (op.equals("+")) {
+            add.setBackgroundResource(R.drawable.white_button);
+            subtract.setBackgroundResource(R.drawable.orange_button);
+            multiply.setBackgroundResource(R.drawable.orange_button);
+            divide.setBackgroundResource(R.drawable.orange_button);
+            add.setTextColor(0xffff9400);
+            subtract.setTextColor(0xffffffff);
+            multiply.setTextColor(0xffffffff);
+            divide.setTextColor(0xffffffff);
+        }
+        if (op.equals("-")) {
+            add.setBackgroundResource(R.drawable.orange_button);
+            subtract.setBackgroundResource(R.drawable.white_button);
+            multiply.setBackgroundResource(R.drawable.orange_button);
+            divide.setBackgroundResource(R.drawable.orange_button);
+            add.setTextColor(0xffffffff);
+            subtract.setTextColor(0xffff9400);
+            multiply.setTextColor(0xffffffff);
+            divide.setTextColor(0xffffffff);
+        }
+        if (op.equals("*")) {
+            add.setBackgroundResource(R.drawable.orange_button);
+            subtract.setBackgroundResource(R.drawable.orange_button);
+            multiply.setBackgroundResource(R.drawable.white_button);
+            divide.setBackgroundResource(R.drawable.orange_button);
+            add.setTextColor(0xffffffff);
+            subtract.setTextColor(0xffffffff);
+            multiply.setTextColor(0xffff9400);
+            divide.setTextColor(0xffffffff);
+        }
+        if (op.equals("/")) {
+            add.setBackgroundResource(R.drawable.orange_button);
+            subtract.setBackgroundResource(R.drawable.orange_button);
+            multiply.setBackgroundResource(R.drawable.orange_button);
+            divide.setBackgroundResource(R.drawable.white_button);
+            add.setTextColor(0xffffffff);
+            subtract.setTextColor(0xffffffff);
+            multiply.setTextColor(0xffffffff);
+            divide.setTextColor(0xffff9400);
+        }
         // ADD BUTTON COLOR CHANGE
         afterSymbol = true;
     }
@@ -247,7 +295,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         answer = Double.parseDouble(commands2.get(0));
         if (answer % 1 == 0) {
             System.out.println("Answer (int): " + (int)answer);
-            if ((int)answer == Integer.MAX_VALUE) {
+            if ((int)answer > 99999999/*== Integer.MAX_VALUE*/) {
                 System.out.println("MAX VALUE");
                 DecimalFormat f = new DecimalFormat("0.##E0");
                 System.out.println("DecimalFormat: " + f.format(answer));
@@ -256,8 +304,26 @@ public class MainActivity extends Activity implements View.OnClickListener {
             else
                 display = new StringBuilder(Integer.toString((int)answer));
         }
-        else
-            display = new StringBuilder(Double.toString(round(Double.parseDouble(commands2.get(0)), 5)));
+        else {
+            System.out.println(commands2.get(0).length());
+            if (commands2.get(0).length() >= 8) {
+                int count = 0;
+                int temp = (int)Double.parseDouble(commands2.get(0));
+                while (temp > 0) {
+                    temp /= 10;
+                    count++;
+                }
+                System.out.println("Count: " + count);
+                if (count > 7) {
+                    display = new StringBuilder(Double.toString(round(Double.parseDouble(commands2.get(0)), 0)));
+                    System.out.println("Rounded: " + round(Double.parseDouble(commands2.get(0)), 0));
+                }
+                else
+                    display = new StringBuilder(Double.toString(round(Double.parseDouble(commands2.get(0)), 7 - count)));
+            }
+            else
+                display = new StringBuilder(Double.toString(round(Double.parseDouble(commands2.get(0)), 8 - commands2.get(0).length())));
+        }
         System.out.println("After A/S: " + commands2);
         commands = new ArrayList<>();
     }
@@ -272,8 +338,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     public static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-
+        if (places < 0)
+            throw new IllegalArgumentException();
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();

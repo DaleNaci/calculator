@@ -1,7 +1,7 @@
 package com.example.dalenash.calculator;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,7 +12,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Widgets
     Button zero, one, two, three, four, five, six, seven, eight, nine, add, subtract, multiply, divide, sign, equal, period, percent, clear;
@@ -21,6 +21,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     ArrayList<String> commands = new ArrayList<>();
     boolean afterSymbol;
     double answer = Integer.MAX_VALUE;
+    boolean error = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,16 +154,26 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (reset)
             commands = new ArrayList<>();
         display = placeZero ? new StringBuilder("0") : new StringBuilder();
+        add.setBackgroundResource(R.drawable.orange_button);
+        add.setTextColor(0xffffffff);
+        subtract.setBackgroundResource(R.drawable.orange_button);
+        subtract.setTextColor(0xffffffff);
+        multiply.setBackgroundResource(R.drawable.orange_button);
+        multiply.setTextColor(0xffffffff);
+        divide.setBackgroundResource(R.drawable.orange_button);
+        divide.setTextColor(0xffffffff);
     }
 
     // Operators
     public void operator(String op) {
         if (answer != Integer.MAX_VALUE && commands.size() == 0)
             commands.add(Double.toString(answer));
-        if (afterSymbol)
-            commands.set(commands.size()-1, op);
-        else
+        if (afterSymbol) {
+            commands.set(commands.size() - 1, op);
+        }
+        else {
             commands.add(op);
+        }
         System.out.println(commands);
         if (op.equals("+")) {
             add.setBackgroundResource(R.drawable.white_button);
@@ -204,7 +215,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
             multiply.setTextColor(0xffffffff);
             divide.setTextColor(0xffff9400);
         }
-        // ADD BUTTON COLOR CHANGE
         afterSymbol = true;
     }
 
@@ -216,6 +226,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     public void calculate() {
+        if (commands.get(commands.size()-1).equals("*") || commands.get(commands.size()-1).equals("/") || commands.get(commands.size()-1).equals("+") || commands.get(commands.size()-1).equals("-"))
+            error = true;
         ArrayList<String> commands2 = new ArrayList<>();
         double finalNum = 0;
         boolean isDecimal = false;
@@ -264,7 +276,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 double y = Double.parseDouble(commands2.get(i+1));
                 if (y == 0) {
                     System.out.println("DIVIDE BY 0 ERROR");
-                    // DIVIDE BY 0 ERROR CODE
+                    error = true;
                 } else {
                     commands2.remove(i + 1);
                     commands2.remove(i);
@@ -293,20 +305,24 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
         answer = Double.parseDouble(commands2.get(0));
-        if (answer % 1 == 0) {
+        if (error) {
+            display = new StringBuilder("Error");
+            error = false;
+        } else if (answer % 1 == 0) {
             System.out.println("Answer (int): " + (int)answer);
-            if ((int)answer > 99999999/*== Integer.MAX_VALUE*/) {
+            if ((int)answer > 99999999) {
                 System.out.println("MAX VALUE");
                 DecimalFormat f = new DecimalFormat("0.##E0");
                 System.out.println("DecimalFormat: " + f.format(answer));
                 display = new StringBuilder(f.format(answer));
             }
-            else
-                display = new StringBuilder(Integer.toString((int)answer));
+            else {
+                display = new StringBuilder(Integer.toString((int) answer));
+            }
         }
         else {
             System.out.println(commands2.get(0).length());
-            if (commands2.get(0).length() >= 8) {
+            if (commands2.get(0).length() >= 15) { // POST-PROJECT: 15 TO 8
                 int count = 0;
                 int temp = (int)Double.parseDouble(commands2.get(0));
                 while (temp > 0) {
@@ -318,11 +334,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     display = new StringBuilder(Double.toString(round(Double.parseDouble(commands2.get(0)), 0)));
                     System.out.println("Rounded: " + round(Double.parseDouble(commands2.get(0)), 0));
                 }
-                else
+                else {
                     display = new StringBuilder(Double.toString(round(Double.parseDouble(commands2.get(0)), 7 - count)));
+                }
             }
-            else
+            else {
                 display = new StringBuilder(Double.toString(round(Double.parseDouble(commands2.get(0)), 8 - commands2.get(0).length())));
+            }
         }
         System.out.println("After A/S: " + commands2);
         commands = new ArrayList<>();

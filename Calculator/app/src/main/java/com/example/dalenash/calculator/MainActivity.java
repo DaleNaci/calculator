@@ -226,7 +226,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void calculate() {
-        if (commands.get(commands.size()-1).equals("*") || commands.get(commands.size()-1).equals("/") || commands.get(commands.size()-1).equals("+") || commands.get(commands.size()-1).equals("-"))
+        if (commands.size() == 0)
+            error = true;
+        else if (commands.get(commands.size()-1).equals("*") || commands.get(commands.size()-1).equals("/") || commands.get(commands.size()-1).equals("+") || commands.get(commands.size()-1).equals("-"))
             error = true;
         ArrayList<String> commands2 = new ArrayList<>();
         double finalNum = 0;

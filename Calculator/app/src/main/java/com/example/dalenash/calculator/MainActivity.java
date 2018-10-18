@@ -234,7 +234,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         double finalNum = 0;
         boolean isDecimal = false;
         int intoDecimal = 0;
-        double currentNum = 0;
         System.out.println("Calculate()");
         System.out.println(commands);
         for (String command : commands) {
